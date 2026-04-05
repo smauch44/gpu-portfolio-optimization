@@ -120,7 +120,7 @@ portfolio_cuda/
 ├── Makefile               # Build system
 ├── run.sh                 # Execution script
 └── README.md
-
+```
 
 ## Build and Run
 
