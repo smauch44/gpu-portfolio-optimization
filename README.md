@@ -93,6 +93,7 @@ Speedup = T_CPU / T_GPU
 
 ## Project Structure
 
+```text
 portfolio_cuda/
 │
 ├── data/                  # Input datasets
