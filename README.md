@@ -121,7 +121,6 @@ portfolio_cuda/
 ├── run.sh                 # Execution script
 └── README.md
 
----
 
 ## Build and Run
 
