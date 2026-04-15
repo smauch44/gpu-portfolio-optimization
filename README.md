@@ -96,30 +96,49 @@ Speedup = T_CPU / T_GPU
 ```text
 portfolio_cuda/
 │
-├── data/                  # Input datasets
-├── results/               # Benchmark outputs
-│
-├── include/               # Header files
-│   ├── config.h
-│   ├── cpu_portfolio.h
-│   ├── gpu_portfolio.h
-│   ├── data_loader.h
+├── include/                        # Header files
+│   ├── asset_universe.h
 │   ├── benchmark.h
+│   ├── cpu_portfolio.h
+│   ├── data_loader.h
+│   ├── gpu_portfolio.h
 │   └── utils.h
 │
-├── src/                   # Source code
+├── src/                            # Source code
 │   ├── main.cu
-│   ├── cpu_portfolio.cpp
 │   ├── gpu_portfolio.cu
+│   ├── synthetic_benchmark.cu
+│   ├── cpu_portfolio.cpp
 │   ├── data_loader.cpp
-│   ├── covariance.cpp
-│   ├── optimization.cpp
 │   ├── benchmark.cpp
 │   └── utils.cpp
 │
-├── Makefile               # Build system
-├── run.sh                 # Execution script
-└── README.md
+├── data/                           # Input datasets
+│   └── financial_prices.csv
+│
+├── results/                        # Benchmark outputs
+│   ├── real_benchmark.json
+│   ├── real_benchmark.log
+│   ├── scalability_results.csv
+│   ├── report_metrics.csv
+│   └── benchmark_table.tex
+│
+├── figures/                        # Generated plots (Figs 1–9)
+│   ├── fig1_runtime_comparison.png
+│   ├── fig2_speedup_curve.png
+│   ├── fig3_portfolio_weights.png
+│   ├── fig4_covariance_heatmap.png
+│   ├── fig5_efficient_frontier.png
+│   ├── fig6_backtest.png
+│   ├── fig7_flop_analysis.png
+│   ├── fig8_numerical_accuracy.png
+│   └── fig9_weights_by_class.png
+│
+├── analytics.py                    # Portfolio analytics pipeline
+├── download_data.py                # Financial data download (50 tickers)
+├── Makefile                        # Build system
+├── run.sh                          # End-to-end execution script
+└── run_20260415_120746.log         # Latest run log
 ```
 
 ## Build and Run
