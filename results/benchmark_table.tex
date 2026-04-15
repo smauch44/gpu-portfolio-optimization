@@ -1,0 +1,17 @@
+\begin{table}[ht]
+\centering
+\caption{CPU vs GPU Benchmark Results. Synthetic returns $\mathcal{N}(0,0.01^2)$; seed=42. Speedup $= T_{\text{CPU}}/T_{\text{GPU}}$.}
+\label{tab:benchmark}
+\begin{tabular}{rrrrrrrrrr}
+\toprule
+N & T & CPU (ms) & GPU (ms) & Speedup & Cov FLOPs & Chol FLOPs & max|Δw| & Δσ²/σ² \\
+\midrule
+25 & 2010 & 2.441 & 217.350 & 0.0112× & 1.26e+06 & 5.21e+03 & 0.00e+00 & 0.00e+00 \\
+50 & 1000 & 4.733 & 207.811 & 0.0228× & 2.50e+06 & 4.17e+04 & 0.00e+00 & 0.00e+00 \\
+100 & 1000 & 17.675 & 208.893 & 0.0846× & 1.00e+07 & 3.33e+05 & 0.00e+00 & 0.00e+00 \\
+250 & 2000 & 208.553 & 220.770 & 0.9447× & 1.25e+08 & 5.21e+06 & 0.00e+00 & 0.00e+00 \\
+500 & 2000 & 893.731 & 235.845 & 3.7895× & 5.00e+08 & 4.17e+07 & 0.00e+00 & 0.00e+00 \\
+1000 & 2000 & 3991.514 & 290.571 & 13.7368× & 2.00e+09 & 3.33e+08 & 0.00e+00 & 0.00e+00 \\
+\bottomrule
+\end{tabular}
+\end{table}

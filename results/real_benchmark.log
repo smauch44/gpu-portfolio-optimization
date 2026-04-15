@@ -1,0 +1,116 @@
+Tickers: SPY, QQQ, IWM, DIA, VTI, XLK, XLF, XLE, XLV, XLP, XLI, XLB, XLY, XLU, EFA, EEM, VEA, VWO, IEMG, TLT, IEF, SHY, TIP, LQD, HYG, BND, EMB, MUB, VCIT, VNQ, IYR, GLD, SLV, GSG, DBC, USO, DBA, PDBC, MTUM, VLUE, USMV, QUAL, BWX, IAGG
+Price shape : (2011 x 44)
+Return shape: (2010 x 44)
+
+CPU GMV Weights
+--------------------------------------------------
+   SPY: 0.035953
+   QQQ: -0.000694
+   IWM: -0.001703
+   DIA: -0.010919
+   VTI: 0.018756
+   XLK: -0.012537
+   XLF: 0.010752
+   XLE: -0.004653
+   XLV: 0.002449
+   XLP: 0.006688
+   XLI: -0.000917
+   XLB: 0.001464
+   XLY: -0.009072
+   XLU: -0.009668
+   EFA: 0.017992
+   EEM: -0.003384
+   VEA: -0.019008
+   VWO: 0.031412
+  IEMG: -0.020946
+   TLT: -0.027002
+   IEF: -0.084640
+   SHY: 0.768212
+   TIP: 0.065854
+   LQD: -0.050194
+   HYG: 0.040289
+   BND: -0.001267
+   EMB: -0.035582
+   MUB: 0.108780
+  VCIT: 0.012491
+   VNQ: -0.008822
+   IYR: -0.014173
+   GLD: 0.001433
+   SLV: -0.007712
+   GSG: -0.017560
+   DBC: -0.003573
+   USO: 0.002643
+   DBA: 0.020899
+  PDBC: 0.028807
+  MTUM: 0.003985
+  VLUE: 0.000315
+  USMV: 0.004354
+  QUAL: -0.018939
+   BWX: -0.034275
+  IAGG: 0.213710
+Sum: 1.0000000000
+
+GPU GMV Weights
+--------------------------------------------------
+   SPY: 0.035953
+   QQQ: -0.000694
+   IWM: -0.001703
+   DIA: -0.010919
+   VTI: 0.018756
+   XLK: -0.012537
+   XLF: 0.010752
+   XLE: -0.004653
+   XLV: 0.002449
+   XLP: 0.006688
+   XLI: -0.000917
+   XLB: 0.001464
+   XLY: -0.009072
+   XLU: -0.009668
+   EFA: 0.017992
+   EEM: -0.003384
+   VEA: -0.019008
+   VWO: 0.031412
+  IEMG: -0.020946
+   TLT: -0.027002
+   IEF: -0.084640
+   SHY: 0.768212
+   TIP: 0.065854
+   LQD: -0.050194
+   HYG: 0.040289
+   BND: -0.001267
+   EMB: -0.035582
+   MUB: 0.108780
+  VCIT: 0.012491
+   VNQ: -0.008822
+   IYR: -0.014173
+   GLD: 0.001433
+   SLV: -0.007712
+   GSG: -0.017560
+   DBC: -0.003573
+   USO: 0.002643
+   DBA: 0.020899
+  PDBC: 0.028807
+  MTUM: 0.003985
+  VLUE: 0.000315
+  USMV: 0.004354
+  QUAL: -0.018939
+   BWX: -0.034275
+  IAGG: 0.213710
+Sum: 1.0000000000
+
+===BENCHMARK_JSON_BEGIN===
+{
+  "n_assets":44,
+  "n_observations":2010,
+  "cpu_total_ms":19.003118,
+  "cpu_cov_ms":18.895296,
+  "cpu_solve_ms":0.107524,
+  "gpu_total_ms":290.937561,
+  "gpu_cov_ms":22.883835,
+  "gpu_solve_ms":7.925883,
+  "speedup":0.065317,
+  "cpu_variance":0.000001,
+  "gpu_variance":0.000001,
+  "max_weight_diff":0.000000
+}
+===BENCHMARK_JSON_END===

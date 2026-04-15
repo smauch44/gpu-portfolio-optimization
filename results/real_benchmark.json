@@ -1,0 +1,14 @@
+{
+  "n_assets": 44,
+  "n_observations": 2010,
+  "cpu_total_ms": 19.003118,
+  "cpu_cov_ms": 18.895296,
+  "cpu_solve_ms": 0.107524,
+  "gpu_total_ms": 290.937561,
+  "gpu_cov_ms": 22.883835,
+  "gpu_solve_ms": 7.925883,
+  "speedup": 0.065317,
+  "cpu_variance": 1e-06,
+  "gpu_variance": 1e-06,
+  "max_weight_diff": 0.0
+}
