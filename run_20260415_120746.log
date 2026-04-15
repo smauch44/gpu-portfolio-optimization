@@ -1,0 +1,290 @@
+
+[1;36m[1m══════════════════════════════════════════════════════════════════════════[0m
+[1;36m[1m  GPU-Accelerated Portfolio Optimization  |  EN.605.617[0m
+[1;36m[1m══════════════════════════════════════════════════════════════════════════[0m
+  [0;37mStefan Mauch · Johns Hopkins University · Spring 2026[0m
+  [0;37mRun log: /content/portfolio_cuda/run_20260415_120746.log[0m
+  [0;37mStarted: Wed Apr 15 12:07:46 PM UTC 2026[0m
+
+[1;36m[1m══════════════════════════════════════════════════════════════════════════[0m
+[1;36m[1m  STEP 0 — Environment checks[0m
+[1;36m[1m══════════════════════════════════════════════════════════════════════════[0m
+
+[1m── CUDA compiler (nvcc) ──[0m
+  [1;32m✓[0m  nvcc found: V12.8.93
+
+[1m── GPU device ──[0m
+  [1;32m✓[0m  GPU:    Tesla T4
+  [1;32m✓[0m  Memory: 15360 MiB
+  [1;32m✓[0m  Driver: 580.82.07
+Wed Apr 15 12:07:46 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 580.82.07              Driver Version: 580.82.07      CUDA Version: 13.0     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  Tesla T4                       Off |   00000000:00:04.0 Off |                    0 |
+| N/A   44C    P8              9W /   70W |       3MiB /  15360MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
+[1m── C++ compiler (g++) ──[0m
+  [1;32m✓[0m  g++ found: g++ (Ubuntu 11.4.0-1ubuntu1~22.04.3) 11.4.0
+
+[1m── CUDA libraries (cuBLAS, cuSOLVER) ──[0m
+  [1;32m✓[0m  libcublas found
+  [1;32m✓[0m  libcusolver found
+
+[1m── Python environment ──[0m
+  [1;32m✓[0m  Python: Python 3.12.13
+  [1;32m✓[0m  All required Python packages present
+  [1;32m✓[0m  cupy available (GPU-accelerated NumPy)
+
+[1;36m[1m══════════════════════════════════════════════════════════════════════════[0m
+[1;36m[1m  STEP 1 — Directory setup[0m
+[1;36m[1m══════════════════════════════════════════════════════════════════════════[0m
+  [1;32m✓[0m  Project directories: include/ src/ bin/ data/ results/ figures/
+
+[1;36m[1m══════════════════════════════════════════════════════════════════════════[0m
+[1;36m[1m  STEP 2 — Build C++/CUDA project[0m
+[1;36m[1m══════════════════════════════════════════════════════════════════════════[0m
+
+[1m── Checking source files ──[0m
+  [1;32m✓[0m  src/utils.cpp
+  [1;32m✓[0m  src/data_loader.cpp
+  [1;32m✓[0m  src/cpu_portfolio.cpp
+  [1;32m✓[0m  src/benchmark.cpp
+  [1;32m✓[0m  src/gpu_portfolio.cu
+  [1;32m✓[0m  src/main.cu
+  [1;32m✓[0m  src/synthetic_benchmark.cu
+  [1;32m✓[0m  include/asset_universe.h
+  [1;32m✓[0m  include/data_loader.h
+  [1;32m✓[0m  include/utils.h
+  [1;32m✓[0m  include/cpu_portfolio.h
+  [1;32m✓[0m  include/gpu_portfolio.h
+  [1;32m✓[0m  include/benchmark.h
+
+[1m── Compiling (make clean && make) ──[0m
+rm -rf ./bin
+mkdir -p bin
+g++ -O2 -std=c++17 -I./include -c src/utils.cpp -o bin/utils.o
+g++ -O2 -std=c++17 -I./include -c src/data_loader.cpp -o bin/data_loader.o
+g++ -O2 -std=c++17 -I./include -c src/cpu_portfolio.cpp -o bin/cpu_portfolio.o
+g++ -O2 -std=c++17 -I./include -c src/benchmark.cpp -o bin/benchmark.o
+nvcc -O2 -std=c++17 -I./include -c src/gpu_portfolio.cu -o bin/gpu_portfolio.o
+nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
+nvcc -O2 -std=c++17 -I./include -c src/main.cu -o bin/main.o
+nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
+nvcc -O2 -std=c++17 -I./include bin/utils.o bin/data_loader.o bin/cpu_portfolio.o bin/benchmark.o bin/gpu_portfolio.o bin/main.o -o bin/portfolio_app -lcublas -lcusolver
+nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
+✓  portfolio_app
+nvcc -O2 -std=c++17 -I./include -c src/synthetic_benchmark.cu -o bin/synthetic_benchmark.o
+nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
+nvcc -O2 -std=c++17 -I./include bin/utils.o bin/data_loader.o bin/cpu_portfolio.o bin/benchmark.o bin/gpu_portfolio.o bin/synthetic_benchmark.o -o bin/synthetic_benchmark -lcublas -lcusolver
+nvcc warning : Support for offline compilation for architectures prior to '<compute/sm/lto>_75' will be removed in a future release (Use -Wno-deprecated-gpu-targets to suppress warning).
+✓  synthetic_benchmark
+  [1;32m✓[0m  Build successful
+  [1;32m✓[0m  bin/portfolio_app  (1036 KB)
+  [1;32m✓[0m  bin/synthetic_benchmark  (1036 KB)
+
+[1;36m[1m══════════════════════════════════════════════════════════════════════════[0m
+[1;36m[1m  STEP 3 — Financial data download[0m
+[1;36m[1m══════════════════════════════════════════════════════════════════════════[0m
+
+[1m── Running download_data.py ──[0m
+[                       0%                       ][**                     5%                       ]  2 of 44 completed[***                    7%                       ]  3 of 44 completed[****                   9%                       ]  4 of 44 completed[*****                 11%                       ]  5 of 44 completed[*******               14%                       ]  6 of 44 completed[********              16%                       ]  7 of 44 completed[*********             18%                       ]  8 of 44 completed[**********            20%                       ]  9 of 44 completed[***********           23%                       ]  10 of 44 completed[************          25%                       ]  11 of 44 completed[*************         27%                       ]  12 of 44 completed[**************        30%                       ]  13 of 44 completed[***************       32%                       ]  14 of 44 completed[****************      34%                       ]  15 of 44 completed[*****************     36%                       ]  16 of 44 completed[*******************   39%                       ]  17 of 44 completed[********************  41%                       ]  18 of 44 completed[********************* 43%                       ]  19 of 44 completed[**********************45%                       ]  20 of 44 completed[**********************48%                       ]  21 of 44 completed[**********************50%                       ]  22 of 44 completed[**********************52%                       ]  23 of 44 completed[**********************55%*                      ]  24 of 44 completed[**********************57%**                     ]  25 of 44 completed[**********************59%***                    ]  26 of 44 completed[**********************61%****                   ]  27 of 44 completed[**********************64%******                 ]  28 of 44 completed[**********************66%*******                ]  29 of 44 completed[**********************68%********               ]  30 of 44 completed[**********************70%*********              ]  31 of 44 completed[**********************73%**********             ]  32 of 44 completed[**********************75%***********            ]  33 of 44 completed[**********************77%************           ]  34 of 44 completed[**********************80%*************          ]  35 of 44 completed[**********************82%**************         ]  36 of 44 completed[**********************84%***************        ]  37 of 44 completed[**********************86%****************       ]  38 of 44 completed[**********************89%******************     ]  39 of 44 completed[**********************91%*******************    ]  40 of 44 completed[**********************93%********************   ]  41 of 44 completed[**********************95%*********************  ]  42 of 44 completed[**********************98%********************** ]  43 of 44 completed[*********************100%***********************]  44 of 44 completed
+
+Total tickers requested : 44
+
+  US Equity — Broad             : SPY, QQQ, IWM, DIA, VTI
+  US Equity — Sector            : XLK, XLF, XLE, XLV, XLP, XLI, XLB, XLY, XLU
+  International Equity          : EFA, EEM, VEA, VWO, IEMG
+  Fixed Income                  : TLT, IEF, SHY, TIP, LQD, HYG, BND, EMB, MUB, VCIT
+  Real Assets                   : VNQ, IYR, GLD, SLV, GSG
+  Commodities                   : DBC, USO, DBA, PDBC
+  Factor ETFs                   : MTUM, VLUE, USMV, QUAL
+  Intl Fixed Income             : BWX, IAGG
+
+Downloading adjusted-close prices from Yahoo Finance…
+  Tickers : 44
+  Range   : 2018-01-01 → 2026-01-01
+
+
+✓ Saved 44 tickers × 2011 trading days → /content/portfolio_cuda/data/financial_prices.csv
+  Date range : 2018-01-02 → 2025-12-31
+
+── Return-series diagnostics ──────────────────────────────────────────
+  Full returns shape : (2010, 44)
+  Core-25 shape      : (2010, 25)
+  Annualised vol SPY : 19.5%  (sanity check — expect ~15–20%)
+
+── Asset-class coverage ────────────────────────────────────────────────
+  US Equity — Broad             : 5/5  ['SPY', 'QQQ', 'IWM', 'DIA', 'VTI']
+  US Equity — Sector            : 9/9  ['XLK', 'XLF', 'XLE', 'XLV', 'XLP', 'XLI', 'XLB', 'XLY', 'XLU']
+  International Equity          : 5/5  ['EFA', 'EEM', 'VEA', 'VWO', 'IEMG']
+  Fixed Income                  : 10/10  ['TLT', 'IEF', 'SHY', 'TIP', 'LQD', 'HYG', 'BND', 'EMB', 'MUB', 'VCIT']
+  Real Assets                   : 5/5  ['VNQ', 'IYR', 'GLD', 'SLV', 'GSG']
+  Commodities                   : 4/4  ['DBC', 'USO', 'DBA', 'PDBC']
+  Factor ETFs                   : 4/4  ['MTUM', 'VLUE', 'USMV', 'QUAL']
+  Intl Fixed Income             : 2/2  ['BWX', 'IAGG']
+
+✓ download_data.py complete.
+
+  [1;32m✓[0m  financial_prices.csv written  (1592 KB)
+
+[1;36m[1m══════════════════════════════════════════════════════════════════════════[0m
+[1;36m[1m  STEP 4 — Running full analytics pipeline[0m
+[1;36m[1m══════════════════════════════════════════════════════════════════════════[0m
+[                       0%                       ][**                     5%                       ]  2 of 44 completed[***                    7%                       ]  3 of 44 completed[****                   9%                       ]  4 of 44 completed[*****                 11%                       ]  5 of 44 completed[*******               14%                       ]  6 of 44 completed[********              16%                       ]  7 of 44 completed[*********             18%                       ]  8 of 44 completed[**********            20%                       ]  9 of 44 completed[***********           23%                       ]  10 of 44 completed[************          25%                       ]  11 of 44 completed[*************         27%                       ]  12 of 44 completed[**************        30%                       ]  13 of 44 completed[***************       32%                       ]  14 of 44 completed[****************      34%                       ]  15 of 44 completed[*****************     36%                       ]  16 of 44 completed[*******************   39%                       ]  17 of 44 completed[********************  41%                       ]  18 of 44 completed[********************* 43%                       ]  19 of 44 completed[**********************45%                       ]  20 of 44 completed[**********************48%                       ]  21 of 44 completed[**********************50%                       ]  22 of 44 completed[**********************52%                       ]  23 of 44 completed[**********************55%*                      ]  24 of 44 completed[**********************57%**                     ]  25 of 44 completed[**********************59%***                    ]  26 of 44 completed[**********************61%****                   ]  27 of 44 completed[**********************64%******                 ]  28 of 44 completed[**********************66%*******                ]  29 of 44 completed[**********************68%********               ]  30 of 44 completed[**********************70%*********              ]  31 of 44 completed[**********************73%**********             ]  32 of 44 completed[**********************75%***********            ]  33 of 44 completed[**********************77%************           ]  34 of 44 completed[**********************80%*************          ]  35 of 44 completed[**********************82%**************         ]  36 of 44 completed[**********************84%***************        ]  37 of 44 completed[**********************86%****************       ]  38 of 44 completed[**********************89%******************     ]  39 of 44 completed[**********************91%*******************    ]  40 of 44 completed[**********************93%********************   ]  41 of 44 completed[**********************93%********************   ]  41 of 44 completed[**********************98%********************** ]  43 of 44 completed[*********************100%***********************]  44 of 44 completed
+
+════════════════════════════════════════════════════════════════════════
+  STEP 1 — Download price data from Yahoo Finance
+════════════════════════════════════════════════════════════════════════
+  Downloading adjusted-close prices (Jan 2018 – Jan 2026)…
+  ✓  Saved 44 tickers × 2011 trading days → /content/portfolio_cuda/data/financial_prices.csv
+  Date range: 2018-01-02 → 2025-12-31
+
+════════════════════════════════════════════════════════════════════════
+  STEP 2 — Real-data benchmark (44 assets × 2,010 observations)
+════════════════════════════════════════════════════════════════════════
+  ✓  results/real_benchmark.json
+
+  Phase                              CPU (ms)     GPU (ms)
+  ────────────────────────────────────────────────────────
+  Covariance Σ                         18.895       22.884
+  Cholesky solve Σx=1                   0.108        7.926
+  Total end-to-end                     19.003      290.938
+
+  Speedup = 0.0653×   max|Δw| = 0.00e+00
+
+════════════════════════════════════════════════════════════════════════
+  STEP 3 — Scalability sweep: N ∈ {25, 50, 100, 250, 500, 1000}
+════════════════════════════════════════════════════════════════════════
+
+       N      T │     CPU (ms)     GPU (ms) │    Speedup      max|Δw|
+  ──────────────────────────────────────────────────────────────────
+      25   2010 │        2.441      217.350 │     0.0112×     0.00e+00
+      50   1000 │        4.733      207.811 │     0.0228×     0.00e+00
+     100   1000 │       17.675      208.893 │     0.0846×     0.00e+00
+     250   2000 │      208.553      220.770 │     0.9447×     0.00e+00
+     500   2000 │      893.731      235.845 │     3.7895×     0.00e+00
+    1000   2000 │     3991.514      290.571 │    13.7368×     0.00e+00
+  ✓  results/scalability_results.csv
+
+════════════════════════════════════════════════════════════════════════
+  STEP 4 — Portfolio analytics (efficient frontier, backtest)
+════════════════════════════════════════════════════════════════════════
+  GMV:        σ=1.62%  r=2.20%  SR=1.360
+  Max Sharpe: σ=2.23%  r=3.70%  SR=1.655
+  Equal Wt:   σ=11.61%  r=8.83%  SR=0.761
+
+  ────────────────────────────────────────────────────────────
+  Out-of-Sample Backtest (252-day window, quarterly rebal.)
+  Strategy         Ann.Ret%    Ann.Vol%    Sharpe    MaxDD%
+  -------------  ----------  ----------  --------  --------
+  GMV (rolling)         9.3        11.6      0.8      -24.9
+  Equal Weight         11.1        11.9      0.93     -24.9
+  SPY                  18.2        19.8      0.92     -33.7
+
+════════════════════════════════════════════════════════════════════════
+  STEP 5 — Export report metrics (CSV + LaTeX)
+════════════════════════════════════════════════════════════════════════
+  ✓  results/report_metrics.csv
+  ✓  results/benchmark_table.tex
+
+     N     T    CPU (ms)    GPU (ms)  Speedup      Cov FLOPs     Chol FLOPs    max|Δw|    Δσ²/σ²
+  ----  ----  ----------  ----------  ---------  -----------  -------------  ---------  --------
+    25  2010       2.441     217.35   0.0112×       1.26e+06    5210                 0         0
+    50  1000       4.733     207.811  0.0228×       2.5e+06    41700                 0         0
+   100  1000      17.675     208.893  0.0846×       1e+07     333000                 0         0
+   250  2000     208.553     220.77   0.9447×       1.25e+08       5.21e+06          0         0
+   500  2000     893.731     235.845  3.7895×       5e+08          4.17e+07          0         0
+  1000  2000    3991.51      290.571  13.7368×      2e+09          3.33e+08          0         0
+
+════════════════════════════════════════════════════════════════════════
+  STEP 6 — Generating publication-quality figures (200 dpi)
+════════════════════════════════════════════════════════════════════════
+  ✓  figures/fig1_runtime_comparison.png
+  ✓  figures/fig2_speedup_curve.png
+  ✓  figures/fig3_portfolio_weights.png
+  ✓  figures/fig4_covariance_heatmap.png
+  ✓  figures/fig5_efficient_frontier.png
+  ✓  figures/fig6_backtest.png
+  ✓  figures/fig7_flop_analysis.png
+  ✓  figures/fig8_numerical_accuracy.png
+  ✓  figures/fig9_weights_by_class.png
+
+════════════════════════════════════════════════════════════════════════
+  SUMMARY — GPU-Accelerated Portfolio Optimization
+════════════════════════════════════════════════════════════════════════
+
+       N     Speedup  Decision
+  ────────────────────────────────────────
+      25      0.0112×  ✗ CPU faster (init overhead)
+      50      0.0228×  ✗ CPU faster (init overhead)
+     100      0.0846×  ✗ CPU faster (init overhead)
+     250      0.9447×  ✗ CPU faster (init overhead)
+     500      3.7895×  ✓ GPU wins
+    1000     13.7368×  ✓ GPU wins
+
+  Real-data (N=44):   Speedup = 0.0653×    max|Δw| = 0.00e+00
+
+  Output files:
+    results/benchmark_table.tex                     0.9 KB
+    results/real_benchmark.json                     0.3 KB
+    results/real_benchmark.log                      2.3 KB
+    results/report_metrics.csv                      0.5 KB
+    results/scalability_results.csv                 0.7 KB
+    figures/fig1_runtime_comparison.png             143 KB
+    figures/fig2_speedup_curve.png                  123 KB
+    figures/fig3_portfolio_weights.png              230 KB
+    figures/fig4_covariance_heatmap.png             246 KB
+    figures/fig5_efficient_frontier.png             643 KB
+    figures/fig6_backtest.png                       392 KB
+    figures/fig7_flop_analysis.png                  241 KB
+    figures/fig8_numerical_accuracy.png             118 KB
+    figures/fig9_weights_by_class.png               266 KB
+
+════════════════════════════════════════════════════════════════════════
+  COMPLETE
+════════════════════════════════════════════════════════════════════════
+
+[1;36m[1m══════════════════════════════════════════════════════════════════════════[0m
+[1;36m[1m  ALL STEPS COMPLETE[0m
+[1;36m[1m══════════════════════════════════════════════════════════════════════════[0m
+
+  [1mElapsed time: 0m 43s[0m
+  [1mRun log:      /content/portfolio_cuda/run_20260415_120746.log[0m
+
+  [1mOutput structure:[0m
+  [0;37mportfolio_cuda/[0m
+  [0;37m├── bin/[0m
+  [0;37m│   ├── portfolio_app          (44-ETF real-data benchmark)[0m
+  [0;37m│   └── synthetic_benchmark    (scalability sweep, N + T args)[0m
+  [0;37m├── data/[0m
+  [0;37m│   └── financial_prices.csv   (50 tickers, 2018–2026)[0m
+  [0;37m├── results/[0m
+  [0;37m│   ├── real_benchmark.json[0m
+  [0;37m│   ├── real_benchmark.log[0m
+  [0;37m│   ├── scalability_results.csv[0m
+  [0;37m│   ├── report_metrics.csv[0m
+  [0;37m│   └── benchmark_table.tex[0m
+  [0;37m└── figures/[0m
+  [0;37m    ├── fig1_runtime_comparison.png[0m
+  [0;37m    ├── fig2_speedup_curve.png[0m
+  [0;37m    ├── fig3_portfolio_weights.png[0m
+  [0;37m    ├── fig4_covariance_heatmap.png[0m
+  [0;37m    ├── fig5_efficient_frontier.png[0m
+  [0;37m    ├── fig6_backtest.png[0m
+  [0;37m    ├── fig7_flop_analysis.png[0m
+  [0;37m    ├── fig8_numerical_accuracy.png[0m
+  [0;37m    └── fig9_weights_by_class.png[0m
+
+  [1mTo re-run individual steps:[0m
+  [0;37m  python3 download_data.py                        # data only[0m
+  [0;37m  python3 download_data.py --start 2020-01-01     # custom range[0m
+  [0;37m  ./bin/portfolio_app data/financial_prices.csv   # C++ benchmark[0m
+  [0;37m  ./bin/synthetic_benchmark 1000 2000             # scalability[0m
+
