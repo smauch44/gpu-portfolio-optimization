@@ -7,7 +7,7 @@
 #    1. Environment check (CUDA, g++, Python, packages)
 #    2. Directory setup
 #    3. Build C++/CUDA binaries (make)
-#    4. Download financial data (Yahoo Finance via Python)
+#    4. Download financial data  ← download_data.py (50 ETFs, 2018–2026)
 #    5. Real-data benchmark  (44 ETFs × 2,010 days)
 #    6. Scalability sweep    (N ∈ {25,50,100,250,500,1000}, synthetic)
 #    7. Portfolio analytics  (efficient frontier, backtest)
@@ -74,7 +74,6 @@ cd "$SCRIPT_DIR"
 # ─── Timestamp ────────────────────────────────────────────────────────────────
 START_TIME=$(date +%s)
 LOG_FILE="$SCRIPT_DIR/run_$(date +%Y%m%d_%H%M%S).log"
-# Tee all output to log file while still displaying on terminal
 exec > >(tee -a "$LOG_FILE") 2>&1
 
 banner "GPU-Accelerated Portfolio Optimization  |  EN.605.617"
@@ -177,7 +176,6 @@ else
     ok "All required Python packages present"
 fi
 
-# cupy (optional — for GPU-accelerated Python validation)
 if python3 -c "import cupy" 2>/dev/null; then
     ok "cupy available (GPU-accelerated NumPy)"
 else
@@ -208,7 +206,6 @@ if [[ ! -f "$SCRIPT_DIR/Makefile" ]]; then
     exit 1
 fi
 
-# Check all source files are present
 REQUIRED_SOURCES=(
     "src/utils.cpp"
     "src/data_loader.cpp"
@@ -253,7 +250,6 @@ else
     exit 1
 fi
 
-# Verify binaries
 for exe in bin/portfolio_app bin/synthetic_benchmark; do
     if [[ -x "$SCRIPT_DIR/$exe" ]]; then
         SIZE=$(du -k "$SCRIPT_DIR/$exe" | cut -f1)
@@ -271,21 +267,55 @@ fi
 
 
 # =============================================================================
-# STEP 3 — PYTHON ANALYTICS PIPELINE
+# STEP 3 — FINANCIAL DATA DOWNLOAD
 # =============================================================================
-banner "STEP 3 — Running full analytics pipeline"
+banner "STEP 3 — Financial data download"
 
-# Verify analytics.py is present
+DATA_CSV="$SCRIPT_DIR/data/financial_prices.csv"
+DOWNLOAD_PY="$SCRIPT_DIR/download_data.py"
+
+if [[ ! -f "$DOWNLOAD_PY" ]]; then
+    fail "download_data.py not found at $DOWNLOAD_PY"
+    exit 1
+fi
+
+if [[ $SKIP_DOWNLOAD -eq 1 ]]; then
+    # ── Reuse cached data ─────────────────────────────────────────────────────
+    if [[ -f "$DATA_CSV" ]]; then
+        ROWS=$(python3 -c "import pandas as pd; df=pd.read_csv('$DATA_CSV',index_col=0); print(f'{df.shape[1]} tickers × {df.shape[0]} days')")
+        ok "--skip-download: reusing cached $DATA_CSV  ($ROWS)"
+    else
+        warn "--skip-download set but $DATA_CSV not found — downloading anyway"
+        python3 "$DOWNLOAD_PY" --output "$DATA_CSV"
+        ok "Download complete: $DATA_CSV"
+    fi
+else
+    # ── Fresh download ────────────────────────────────────────────────────────
+    step "Running download_data.py"
+    python3 "$DOWNLOAD_PY" --output "$DATA_CSV"
+    if [[ -f "$DATA_CSV" ]]; then
+        SIZE_KB=$(du -k "$DATA_CSV" | cut -f1)
+        ok "financial_prices.csv written  (${SIZE_KB} KB)"
+    else
+        fail "download_data.py finished but $DATA_CSV was not created"
+        exit 1
+    fi
+fi
+
+
+# =============================================================================
+# STEP 4 — PYTHON ANALYTICS PIPELINE
+# =============================================================================
+banner "STEP 4 — Running full analytics pipeline"
+
 ANALYTICS_PY="$SCRIPT_DIR/analytics.py"
 if [[ ! -f "$ANALYTICS_PY" ]]; then
     fail "analytics.py not found at $ANALYTICS_PY"
     exit 1
 fi
 
-# Build argument list for analytics.py
 ANALYTICS_ARGS=""
-[[ $SKIP_DOWNLOAD -eq 1 ]] && ANALYTICS_ARGS="$ANALYTICS_ARGS --skip-download"
-[[ $SKIP_FIGURES  -eq 1 ]] && ANALYTICS_ARGS="$ANALYTICS_ARGS --skip-figures"
+[[ $SKIP_FIGURES -eq 1 ]] && ANALYTICS_ARGS="$ANALYTICS_ARGS --skip-figures"
 
 python3 "$ANALYTICS_PY" $ANALYTICS_ARGS
 
@@ -309,13 +339,13 @@ echo -e "  ${GRAY}├── bin/${RESET}"
 echo -e "  ${GRAY}│   ├── portfolio_app          (44-ETF real-data benchmark)${RESET}"
 echo -e "  ${GRAY}│   └── synthetic_benchmark    (scalability sweep, N + T args)${RESET}"
 echo -e "  ${GRAY}├── data/${RESET}"
-echo -e "  ${GRAY}│   └── financial_prices.csv   (44 tickers, 2018–2026)${RESET}"
+echo -e "  ${GRAY}│   └── financial_prices.csv   (50 tickers, 2018–2026)${RESET}"
 echo -e "  ${GRAY}├── results/${RESET}"
-echo -e "  ${GRAY}│   ├── real_benchmark.json    (N=44 benchmark)${RESET}"
-echo -e "  ${GRAY}│   ├── real_benchmark.log     (full stdout)${RESET}"
+echo -e "  ${GRAY}│   ├── real_benchmark.json${RESET}"
+echo -e "  ${GRAY}│   ├── real_benchmark.log${RESET}"
 echo -e "  ${GRAY}│   ├── scalability_results.csv${RESET}"
-echo -e "  ${GRAY}│   ├── report_metrics.csv     (for Word/LaTeX report)${RESET}"
-echo -e "  ${GRAY}│   └── benchmark_table.tex    (LaTeX booktabs table)${RESET}"
+echo -e "  ${GRAY}│   ├── report_metrics.csv${RESET}"
+echo -e "  ${GRAY}│   └── benchmark_table.tex${RESET}"
 echo -e "  ${GRAY}└── figures/${RESET}"
 echo -e "  ${GRAY}    ├── fig1_runtime_comparison.png${RESET}"
 echo -e "  ${GRAY}    ├── fig2_speedup_curve.png${RESET}"
@@ -327,10 +357,10 @@ echo -e "  ${GRAY}    ├── fig7_flop_analysis.png${RESET}"
 echo -e "  ${GRAY}    ├── fig8_numerical_accuracy.png${RESET}"
 echo -e "  ${GRAY}    └── fig9_weights_by_class.png${RESET}"
 
-echo -e "\n  ${BOLD}To re-run individual binaries:${RESET}"
-echo -e "  ${GRAY}  # Real-data benchmark (44 ETFs):${RESET}"
-echo -e "  ${GRAY}  ./bin/portfolio_app data/financial_prices.csv${RESET}"
-echo -e "  ${GRAY}  # Scalability (N=1000, T=2000):${RESET}"
-echo -e "  ${GRAY}  ./bin/synthetic_benchmark 1000 2000${RESET}"
+echo -e "\n  ${BOLD}To re-run individual steps:${RESET}"
+echo -e "  ${GRAY}  python3 download_data.py                        # data only${RESET}"
+echo -e "  ${GRAY}  python3 download_data.py --start 2020-01-01     # custom range${RESET}"
+echo -e "  ${GRAY}  ./bin/portfolio_app data/financial_prices.csv   # C++ benchmark${RESET}"
+echo -e "  ${GRAY}  ./bin/synthetic_benchmark 1000 2000             # scalability${RESET}"
 
 echo ""
